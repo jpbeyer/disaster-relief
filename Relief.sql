@@ -115,6 +115,12 @@ CREATE TABLE IF NOT EXISTS `relief`.`disaster` (
   `CallCenter` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`DisasterId`),
   INDEX `DisasType_idx` (`DisasterType` ASC),
+  INDEX `CallCenter_idx` (`CallCenter` ASC),
+  CONSTRAINT `DisasCC`
+    FOREIGN KEY (`CallCenter`)
+    REFERENCES `relief`.`callcenter` (`CallCenterId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT `DisasType`
     FOREIGN KEY (`DisasterType`)
     REFERENCES `relief`.`disastertype` (`TypeId`)
