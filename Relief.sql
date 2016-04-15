@@ -52,7 +52,7 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `relief`.`users`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `relief`.`users` (
-  `UserName` VARCHAR(30) NOT NULL,
+  `UserId` INT(11) NOT NULL AUTO_INCREMENT,
   `FirstName` CHAR(20) NOT NULL,
   `LastName` CHAR(20) NOT NULL,
   `email` VARCHAR(30) NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `relief`.`users` (
   `ZipCode` INT(5) NULL DEFAULT NULL,
   `Phone` VARCHAR(20) NULL DEFAULT NULL,
   `RoleId` INT(1) NULL DEFAULT NULL,
-  PRIMARY KEY (`UserName`),
+  PRIMARY KEY (`UserId`),
   INDEX `RoleId_idx` (`RoleId` ASC),
   CONSTRAINT `RoleId`
     FOREIGN KEY (`RoleId`)
@@ -75,18 +75,18 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `relief`.`ccemp`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `relief`.`ccemp` (
-  `CCEmpName` VARCHAR(30) NOT NULL,
+  `CCEmp` INT(11) NOT NULL,
   `CallCenter` INT(11) NOT NULL,
-  INDEX `ccempname_idx` (`CCEmpName` ASC),
   INDEX `callcenter_idx` (`CallCenter` ASC),
+  INDEX `CCEmp_idx` (`CCEmp` ASC),
+  CONSTRAINT `CCEmp`
+    FOREIGN KEY (`CCEmp`)
+    REFERENCES `relief`.`users` (`UserId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT `callcenter`
     FOREIGN KEY (`CallCenter`)
     REFERENCES `relief`.`callcenter` (`CallCenterId`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `ccempname`
-    FOREIGN KEY (`CCEmpName`)
-    REFERENCES `relief`.`users` (`UserName`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
@@ -149,20 +149,20 @@ CREATE TABLE IF NOT EXISTS `relief`.`requests` (
   `RequestedItems` VARCHAR(30) NULL DEFAULT NULL,
   `RequestStatus` INT(1) NULL DEFAULT NULL,
   `DisasterId` INT(10) NULL DEFAULT NULL,
-  `username` VARCHAR(30) NULL DEFAULT NULL,
+  `RequestUser` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`RequestId`),
   INDEX `status_idx` (`RequestStatus` ASC),
   INDEX `RequestStatus_idx` (`RequestStatus` ASC),
-  INDEX `RequestingUser_idx` (`username` ASC),
   INDEX `disasterid_idx` (`DisasterId` ASC),
+  INDEX `RequestId_idx` (`RequestUser` ASC),
+  CONSTRAINT `RequestId`
+    FOREIGN KEY (`RequestUser`)
+    REFERENCES `relief`.`users` (`UserId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT `RequestStatus`
     FOREIGN KEY (`RequestStatus`)
     REFERENCES `relief`.`aidstatus` (`StatusId`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `RequestingUser`
-    FOREIGN KEY (`username`)
-    REFERENCES `relief`.`users` (`UserName`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `disasterid`
@@ -179,15 +179,20 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `relief`.`provideaid` (
   `ProvideAidId` INT(10) NOT NULL AUTO_INCREMENT,
-  `UserName` VARCHAR(30) NOT NULL,
+  `ProvideUser` INT(11) NOT NULL,
   `RequestId` INT(10) NOT NULL,
   `ProvidedItems` VARCHAR(30) NULL DEFAULT NULL,
   `ProvideQuantity` INT(10) NULL DEFAULT NULL,
   `ProvideAidStatus` INT(1) NULL DEFAULT NULL,
   PRIMARY KEY (`ProvideAidId`),
-  INDEX `UserName_idx` (`UserName` ASC),
   INDEX `Status_idx` (`ProvideAidStatus` ASC),
   INDEX `RequestedAid_idx` (`RequestId` ASC),
+  INDEX `PovidingUser_idx` (`ProvideUser` ASC),
+  CONSTRAINT `ProvideUser`
+    FOREIGN KEY (`ProvideUser`)
+    REFERENCES `relief`.`users` (`UserId`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   CONSTRAINT `RequestedAid`
     FOREIGN KEY (`RequestId`)
     REFERENCES `relief`.`requests` (`RequestId`)
@@ -196,11 +201,6 @@ CREATE TABLE IF NOT EXISTS `relief`.`provideaid` (
   CONSTRAINT `Status`
     FOREIGN KEY (`ProvideAidStatus`)
     REFERENCES `relief`.`aidstatus` (`StatusId`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `username`
-    FOREIGN KEY (`UserName`)
-    REFERENCES `relief`.`users` (`UserName`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
